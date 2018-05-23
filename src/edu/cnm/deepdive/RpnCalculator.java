@@ -10,7 +10,9 @@ import java.util.Stack;
  */
 public class RpnCalculator {
 
-  private RpnCalculator(){ }
+  private RpnCalculator() {
+  }
+
   /**
    * Command-line entry point for RPN interpreter
    *
@@ -18,9 +20,8 @@ public class RpnCalculator {
    */
   public static void main(String[] args) {
     Stack<Double> stack = new Stack<>();
-    for (int i = 0; i < args.length; i++) {
-      args[i] = args[i].trim().toLowerCase();
-      String arg = args[i];
+    for (String arg : args) {
+      arg = arg.trim().toLowerCase();
       switch (arg) {
         case "add":
         case "+":
@@ -42,12 +43,34 @@ public class RpnCalculator {
         case "exp":
           power(stack);
           break;
+        case "abs":
+          abs(stack);
+          break;
+        case "log":
+          log10(stack);
+          break;
+        case "pop":
+          stack.pop(); // discard top value
+          break;
+        case "idiv":
+        case "\\":
+          idiv(stack);
+          break;
+        case "swap":
+          swap(stack);
+          break;
         default:
           stack.push(Double.valueOf(arg));
           break;
       }
     }
-    System.out.printf("Result = %,.2f", stack.pop());
+    if(stack.empty()){
+      System.out.println("Stack empty.");
+    }
+    else{
+      System.out.printf("Result = %,.2f", stack.pop());
+    }
+
   }
 
   /**
@@ -78,6 +101,30 @@ public class RpnCalculator {
     stack.push(Math.pow(values[0], values[1]));
   }
 
+  private static void abs(Stack<Double> stack) {
+    double value = stack.pop();
+    stack.push(Math.abs(value));
+  }
+
+  private static void log10(Stack<Double> stack) {
+    double value = stack.pop();
+    stack.push(Math.log10(value));
+  }
+
+  private static void idiv(Stack<Double> stack) {
+    double[] values = pop(stack, 2);
+    double result = values[0] / values[1];
+    double quotient = Math.floor(result);
+    double remainder = values[0] - values[1] * quotient;
+    stack.push(remainder);
+    stack.push(quotient);
+  }
+
+  private static void swap(Stack<Double> stack) {
+    double[] values = pop(stack, 2);
+    stack.push(values[0]);
+    stack.push(values[1]);
+  }
   private static double[] pop(Stack<Double> stack, int numItems) {
     double[] values = new double[numItems];
     for (int i = 0; i < numItems; i++) {
